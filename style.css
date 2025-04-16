@@ -1,0 +1,91 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  height: 100%;
+  width: 100%;
+}
+
+#gameArea {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  background: #222;
+  overflow: hidden;
+}
+
+#player {
+  width: 50px;
+  height: 50px;
+  background-color: green;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.zombie {
+  width: 50px;
+  height: 50px;
+  background-color: red;
+  position: absolute;
+  top: 0;
+  border-radius: 50%;
+}
+
+.bullet {
+  width: 5px;
+  height: 15px;
+  background: yellow;
+  position: absolute;
+}
+
+#gameOver {
+  display: none;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: white;
+  z-index: 10;
+}
+
+/* Make it mobile-friendly */
+@media (max-width: 768px) {
+  #player {
+    width: 40px;
+    height: 40px;
+  }
+
+  .zombie {
+    width: 40px;
+    height: 40px;
+  }
+}
+#controls {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+#controls button {
+  padding: 15px 25px;
+  font-size: 20px;
+  border: none;
+  border-radius: 10px;
+  background: #444;
+  color: white;
+  cursor: pointer;
+}
+
+#controls button:active {
+  background: #888;
+}
