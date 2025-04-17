@@ -49,7 +49,7 @@ function createZombie() {
     }
 
     // 🧟 Game over if zombie reaches bottom without being killed
-    if (zombieY > window.innerHeight - 40) {
+    if (zombie.getBoundingClientRect().top > window.innerHeight) {
       gameOverSound.play();
       alert("Game Over! A zombie passed through!");
       gameRunning = false;
