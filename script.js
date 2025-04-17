@@ -130,24 +130,34 @@ const rightBtn = document.getElementById('rightBtn');
 const fireBtn = document.getElementById('fireBtn');
 
 // Move Left
-leftBtn.addEventListener('touchstart', () => {
+function handleMoveLeft() {
   if (playerX > 0 && gameRunning) {
     playerX -= 30;
     player.style.left = `${playerX}px`;
   }
-});
+}
 
 // Move Right
-rightBtn.addEventListener('touchstart', () => {
+function handleMoveRight() {
   if (playerX < window.innerWidth - 50 && gameRunning) {
     playerX += 30;
     player.style.left = `${playerX}px`;
   }
-});
+}
 
-// Fire Bullet
-fireBtn.addEventListener('touchstart', () => {
+// Shoot Bullet
+function handleFire() {
   if (gameRunning) {
     shootBullet();
   }
-});
+}
+
+// Add both click and touch events
+leftBtn.addEventListener('click', handleMoveLeft);
+leftBtn.addEventListener('touchstart', handleMoveLeft);
+
+rightBtn.addEventListener('click', handleMoveRight);
+rightBtn.addEventListener('touchstart', handleMoveRight);
+
+fireBtn.addEventListener('click', handleFire);
+fireBtn.addEventListener('touchstart', handleFire);
