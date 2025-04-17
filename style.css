@@ -18,7 +18,7 @@ body {
 
 @media (max-width: 768px) {
   #player {
-    bottom: 100px; /* 👈 Mobile screens ke liye zyada upar */
+    bottom: 80px; /* 👈 Mobile screens ke liye zyada upar */
   }
 }
 
