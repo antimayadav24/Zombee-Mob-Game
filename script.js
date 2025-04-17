@@ -46,6 +46,12 @@ function createZombie() {
       gameRunning = false;
       location.reload();
     }
+    if (zombieY > window.innerHeight) {
+      gameOverSound.play();
+      alert("Game Over! A zombie escaped.");
+      gameRunning = false;
+      location.reload();
+    }
   }, 30);
 }
 
