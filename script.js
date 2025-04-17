@@ -35,25 +35,31 @@ function createZombie() {
     const zombieRect = zombie.getBoundingClientRect();
     const playerRect = player.getBoundingClientRect();
 
-    // Collision with player
+    // ✅ Collision with player
     if (
       zombieRect.bottom > playerRect.top &&
       zombieRect.left < playerRect.right &&
       zombieRect.right > playerRect.left
     ) {
-      gameOverSound.play(); // ☠️ Game over sound
-      alert("Game Over!");
-      gameRunning = false;
-      location.reload();
-    }
-    if (zombieY > window.innerHeight) {
       gameOverSound.play();
-      alert("Game Over! A zombie escaped.");
+      alert("Game Over! Zombie touched you!");
       gameRunning = false;
+      clearInterval(interval);
       location.reload();
     }
+
+    // 🧟 Game over if zombie reaches bottom without being killed
+    if (zombieY > window.innerHeight - 40) {
+      gameOverSound.play();
+      alert("Game Over! A zombie passed through!");
+      gameRunning = false;
+      clearInterval(interval);
+      location.reload();
+    }
+
   }, 30);
 }
+
 
 function shootBullet() {
   shootSound.play(); // 🔫 Fire sound
