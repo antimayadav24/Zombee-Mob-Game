@@ -1,163 +1,121 @@
-const gameArea = document.getElementById('gameArea');
-const player = document.getElementById('player');
-const gameOverScreen = document.getElementById('gameOver');
-const scoreEl = document.createElement('div');
-scoreEl.style.position = 'absolute';
-scoreEl.style.top = '10px';
-scoreEl.style.left = '10px';
-scoreEl.style.fontSize = '20px';
-scoreEl.style.color = 'white';
-gameArea.appendChild(scoreEl);
+const player = document.getElementById("player");
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+const fireBtn = document.getElementById("fireBtn");
+const scoreDisplay = document.getElementById("score");
 
-let playerX = window.innerWidth / 2;
-let bullets = [];
-let zombies = [];
+let playerX = window.innerWidth / 2 - 25;
 let score = 0;
 let gameRunning = true;
 
-// Sound effects
-const shootSound = new Audio('shoot.mp3');  // Make sure you have shoot.mp3 file
-const zombieHitSound = new Audio('zombie-hit.mp3');  // Make sure you have zombie-hit.mp3 file
-const gameOverSound = new Audio('game-over.mp3');  // Make sure you have game-over.mp3 file
+player.style.left = `${playerX}px`;
 
-// Player controls
-document.addEventListener('keydown', (e) => {
-  if (!gameRunning) return;
+function createZombie() {
+  const zombie = document.createElement("div");
+  zombie.classList.add("zombie");
+  zombie.style.left = `${Math.random() * (window.innerWidth - 40)}px`;
+  document.body.appendChild(zombie);
 
-  if (e.key === 'ArrowLeft' && playerX > 0) {
-    playerX -= 30;  // Increase movement speed
-  }
-  if (e.key === 'ArrowRight' && playerX < window.innerWidth - 50) {
-    playerX += 30;  // Increase movement speed
-  }
-  if (e.key === ' ') {
-    shootBullet();
-  }
-  player.style.left = `${playerX}px`;
-});
+  let zombieY = 0;
+  const interval = setInterval(() => {
+    if (!gameRunning) {
+      clearInterval(interval);
+      zombie.remove();
+      return;
+    }
 
-// Shoot bullet and play sound
+    zombieY += 2;
+    zombie.style.top = `${zombieY}px`;
+
+    const zombieRect = zombie.getBoundingClientRect();
+    const playerRect = player.getBoundingClientRect();
+
+    if (
+      zombieRect.bottom >= playerRect.top &&
+      zombieRect.left < playerRect.right &&
+      zombieRect.right > playerRect.left
+    ) {
+      gameRunning = false;
+      alert("Game Over! Score: " + score);
+      location.reload();
+    }
+  }, 16);
+}
+
 function shootBullet() {
-  const bullet = document.createElement('div');
-  bullet.className = 'bullet';
-  bullet.style.left = `${playerX + 22}px`;
-  bullet.style.bottom = `70px`;
-  gameArea.appendChild(bullet);
-  bullets.push(bullet);
+  const bullet = document.createElement("div");
+  bullet.classList.add("bullet");
+  bullet.style.left = `${player.offsetLeft + 22}px`;
+  bullet.style.top = `${player.offsetTop}px`;
+  document.body.appendChild(bullet);
 
-  shootSound.play();  // Play shoot sound
-}
+  let bulletY = player.offsetTop;
+  const interval = setInterval(() => {
+    bulletY -= 10;
+    bullet.style.top = `${bulletY}px`;
 
-// Spawn zombies at random X (adjust spawn rate)
-function spawnZombie() {
-  if (!gameRunning) return;
-
-  const zombie = document.createElement('div');
-  zombie.className = 'zombie';
-  zombie.style.left = `${Math.random() * (window.innerWidth - 50)}px`;
-  gameArea.appendChild(zombie);
-  zombies.push(zombie);
-}
-
-// Update the game (move bullets, zombies)
-function updateGame() {
-  if (!gameRunning) return;
-
-  // Move bullets
-  bullets.forEach((bullet, i) => {
-    bullet.style.bottom = `${parseInt(bullet.style.bottom) + 10}px`;
-    if (parseInt(bullet.style.bottom) > window.innerHeight) {
+    if (bulletY < 0) {
       bullet.remove();
-      bullets.splice(i, 1);
-    }
-  });
-
-  // Move zombies
-  zombies.forEach((zombie, i) => {
-    const top = parseInt(zombie.style.top || 0) + 2;
-    zombie.style.top = `${top}px`;
-
-    // Game Over condition
-    if (top > window.innerHeight - 100) {
-      endGame();
+      clearInterval(interval);
     }
 
-    // Collision detection
-    bullets.forEach((bullet, j) => {
-      const bX = bullet.offsetLeft;
-      const bY = window.innerHeight - parseInt(bullet.style.bottom);
-      const zX = zombie.offsetLeft;
-      const zY = zombie.offsetTop;
+    const bulletRect = bullet.getBoundingClientRect();
+    const zombies = document.querySelectorAll(".zombie");
 
+    zombies.forEach((zombie) => {
+      const zRect = zombie.getBoundingClientRect();
       if (
-        bX > zX && bX < zX + 50 &&
-        bY > zY && bY < zY + 50
+        bulletRect.top < zRect.bottom &&
+        bulletRect.bottom > zRect.top &&
+        bulletRect.left < zRect.right &&
+        bulletRect.right > zRect.left
       ) {
         zombie.remove();
         bullet.remove();
-        zombies.splice(i, 1);
-        bullets.splice(j, 1);
-        
-        score += 10;  // Increase score on zombie kill
-        scoreEl.innerText = `Score: ${score}`;  // Update score display
-
-        zombieHitSound.play();  // Play sound when zombie is hit
+        clearInterval(interval);
+        score++;
+        scoreDisplay.textContent = `Score: ${score}`;
       }
     });
-  });
-
-  requestAnimationFrame(updateGame);
+  }, 16);
 }
 
-// End game and play game over sound
-function endGame() {
-  gameRunning = false;
-  gameOverScreen.style.display = 'block';
-  gameOverSound.play();  // Play game over sound
-}
-
-// Restart game
-function restartGame() {
-  location.reload();
-}
-
-// Start game loop and zombie spawner (slow down spawn rate)
-setInterval(spawnZombie, 3000); // Spawn zombies every 2 sec (adjusted)
-updateGame(); // Start animation loop
-// Touch Button Controls for Mobile
-const leftBtn = document.getElementById('leftBtn');
-const rightBtn = document.getElementById('rightBtn');
-const fireBtn = document.getElementById('fireBtn');
-
-// Move Left
-function handleMoveLeft() {
+// Button event handlers with touch and click
+function handleMoveLeft(e) {
+  e.preventDefault();
   if (playerX > 0 && gameRunning) {
     playerX -= 30;
     player.style.left = `${playerX}px`;
   }
 }
 
-// Move Right
-function handleMoveRight() {
+function handleMoveRight(e) {
+  e.preventDefault();
   if (playerX < window.innerWidth - 50 && gameRunning) {
     playerX += 30;
     player.style.left = `${playerX}px`;
   }
 }
 
-// Shoot Bullet
-function handleFire() {
+function handleFire(e) {
+  e.preventDefault();
   if (gameRunning) {
     shootBullet();
   }
 }
 
-// Add both click and touch events
-leftBtn.addEventListener('click', handleMoveLeft);
-leftBtn.addEventListener('touchstart', handleMoveLeft);
+leftBtn.addEventListener("click", handleMoveLeft);
+leftBtn.addEventListener("touchstart", handleMoveLeft, { passive: false });
 
-rightBtn.addEventListener('click', handleMoveRight);
-rightBtn.addEventListener('touchstart', handleMoveRight);
+rightBtn.addEventListener("click", handleMoveRight);
+rightBtn.addEventListener("touchstart", handleMoveRight, { passive: false });
 
-fireBtn.addEventListener('click', handleFire);
-fireBtn.addEventListener('touchstart', handleFire);
+fireBtn.addEventListener("click", handleFire);
+fireBtn.addEventListener("touchstart", handleFire, { passive: false });
+
+// Zombie spawner
+setInterval(() => {
+  if (gameRunning) {
+    createZombie();
+  }
+}, 1200);
